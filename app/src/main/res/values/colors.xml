@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <integer-array name="gradient_arc_color2">
+        <item>@color/color_home_top</item>
+        <item>@color/progress_end_color</item>
+        <item>@color/color_home_top</item>
+        <!--<item>@color/progress_shape2</item>-->
+    </integer-array>
+    <color name="color_home_top">#ffa20f</color>
+    <color name="progress_end_color">#ff7c0d</color>
+</resources>
