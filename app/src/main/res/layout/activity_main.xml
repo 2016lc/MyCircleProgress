@@ -25,6 +25,7 @@
             app:startAngle="135"
             app:sweepAngle="270"
             android:padding="5dp"
+            app:isanim="false"
             />
 
 

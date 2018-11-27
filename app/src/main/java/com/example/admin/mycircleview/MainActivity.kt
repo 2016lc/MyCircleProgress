@@ -11,11 +11,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         cirView
-            .setValue(99.96f, 200f)
+            .setValue("哈哈哈", 200f)
             .setAnimTime(2000)
             .setIsGradient(true)
             .setGradientColors(intArrayOf(Color.parseColor("#ffa20f"),Color.parseColor("#ff7c0d"), Color.parseColor("#ffa20f")))
             .setSmallCircleEnable(true)
             .setShadowEnable(false)
+            .setDigit(2)
     }
 }

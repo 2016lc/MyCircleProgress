@@ -11,11 +11,12 @@ class Constant {
         val ANTI_ALIAS = false
         val SHADOW_SHOW = false
         val IS_GRADIENT = false
+        val IS_ANIM=true
+        val DEFALUT_DIGIT=2
         val SMALLCIRCLE_ENABLE = false
         val DEFAULT_CIR_WIDTH = 15f
         val DEFAULT_BGCIR_WIDTH = 14f
         val DEFAULT_ANIMTIME=1000
-        val DEFAULT_VALUE=0F
         val DEFAULT_MAX_VALUE=100F
         val DEFAULT_START_ANGLE=270F
         val DEFAULT_SWEEP_ANGLE=360F

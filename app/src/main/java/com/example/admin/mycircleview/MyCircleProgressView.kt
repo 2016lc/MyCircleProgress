@@ -5,7 +5,9 @@ import android.content.Context
 import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import java.text.DecimalFormat
 
 /**
  * Author:LC
@@ -48,7 +50,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     //动画进度
     private var mPercent: Float? = null
     //进度值
-    private var mValue: Float? = null
+    private var mValue: String? = null
     //最大值
     private var mMaxValue: Float? = null
     //绘制数值
@@ -79,6 +81,10 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     private var mShadowColor: Int? = null
     private var mShadowSize: Float? = null
     private var mShadowIsShow: Boolean? = null
+    //是否是整数
+    private var mDigit: Int? = null
+    //是否需要动画
+    private var isAnim: Boolean? = null
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -100,20 +106,27 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
         antiAlias = typedArray!!.getBoolean(R.styleable.MyCircleProgressView_antiAlias, Constant.ANTI_ALIAS)
         mSmallCirEnable =
                 typedArray.getBoolean(R.styleable.MyCircleProgressView_smallCirEnable, Constant.SMALLCIRCLE_ENABLE)
+        isAnim = typedArray.getBoolean(R.styleable.MyCircleProgressView_isanim, Constant.IS_ANIM)
+
+        mDigit = typedArray.getInt(R.styleable.MyCircleProgressView_digit, Constant.DEFALUT_DIGIT)
 
         mBgCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_mBgCirColor, Color.GRAY)
-        mBgCirWidth = typedArray.getDimension(R.styleable.MyCircleProgressView_mBgCirWidth, Constant.DEFAULT_BGCIR_WIDTH)
+        mBgCirWidth =
+                typedArray.getDimension(R.styleable.MyCircleProgressView_mBgCirWidth, Constant.DEFAULT_BGCIR_WIDTH)
 
         mCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_mCirColor, Color.YELLOW)
         mCirWidth = typedArray.getDimension(R.styleable.MyCircleProgressView_mCirWidth, Constant.DEFAULT_CIR_WIDTH)
 
         mSmallCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_smallCirColor, Color.WHITE)
         mSmallCirWidth =
-                typedArray.getDimension(R.styleable.MyCircleProgressView_smallCirWidth, Constant.DEFAULT_SMALLCIRCLE_WIDTH)
+                typedArray.getDimension(
+                    R.styleable.MyCircleProgressView_smallCirWidth,
+                    Constant.DEFAULT_SMALLCIRCLE_WIDTH
+                )
 
         mAnimTime = typedArray.getInt(R.styleable.MyCircleProgressView_animTime, Constant.DEFAULT_ANIMTIME)
 
-        mValue = typedArray.getFloat(R.styleable.MyCircleProgressView_value, Constant.DEFAULT_VALUE)
+        mValue = typedArray.getString(R.styleable.MyCircleProgressView_value)
         mMaxValue = typedArray.getFloat(R.styleable.MyCircleProgressView_maxvalue, Constant.DEFAULT_MAX_VALUE)
 
         mStartAngle = typedArray.getFloat(R.styleable.MyCircleProgressView_startAngle, Constant.DEFAULT_START_ANGLE)
@@ -264,9 +277,8 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
      */
     private fun drawText(canvas: Canvas?) {
 
-
         canvas!!.drawText(
-            mValue.toString(),
+            mValue!!,
             centerPosition!!.x.toFloat(),
             centerPosition!!.y.toFloat(),
             mValuePaint!!
@@ -319,12 +331,16 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     /**
      * 设值
      */
-    fun setValue(value: Float,maxValue: Float): MyCircleProgressView {
-        mValue = value
-        mMaxValue = maxValue
-        val start = mPercent
-        val end = value / maxValue
-        startAnim(start!!, end, mAnimTime!!)
+    fun setValue(value: String, maxValue: Float): MyCircleProgressView {
+        if (isNum(value)) {
+            mValue = value
+            mMaxValue = maxValue
+            val start = mPercent
+            val end = value.toFloat() / maxValue
+            startAnim(start!!, end, mAnimTime!!)
+        } else {
+            mValue = value
+        }
         return this
     }
 
@@ -336,7 +352,11 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
         mAnimator!!.duration = animTime.toLong()
         mAnimator!!.addUpdateListener {
             mPercent = it.animatedValue as Float?
-            mValue = Math.round(mPercent!! * mMaxValue!! * 100) / 100.00.toFloat()
+            mValue = if (isAnim!!) {
+                roundByScale((mPercent!! * mMaxValue!!).toDouble(), mDigit!!)
+            } else {
+                roundByScale(mValue!!.toDouble(), mDigit!!)
+            }
             postInvalidate()
         }
         mAnimator!!.start()
@@ -354,8 +374,8 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
 
     /**
      * 是否渐变色
-    * */
-    fun setIsGradient(isGradient:Boolean):MyCircleProgressView{
+     * */
+    fun setIsGradient(isGradient: Boolean): MyCircleProgressView {
         this.isGradient = isGradient
         invalidate()
         return this
@@ -363,8 +383,8 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
 
     /**
      * 设置渐变色
-    * */
-    fun setGradientColors(gradientColors: IntArray) :MyCircleProgressView{
+     * */
+    fun setGradientColors(gradientColors: IntArray): MyCircleProgressView {
         mGradientColors = gradientColors
         sweepGradientCircle()
         return this
@@ -373,7 +393,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     /**
      * 是否显示起始小圆
      * */
-    fun setSmallCircleEnable(enable:Boolean):MyCircleProgressView{
+    fun setSmallCircleEnable(enable: Boolean): MyCircleProgressView {
         mSmallCirEnable = enable
         invalidate()
         return this
@@ -382,10 +402,54 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     /**
      * 是否显示阴影
      * */
-    fun setShadowEnable(enable: Boolean):MyCircleProgressView{
+    fun setShadowEnable(enable: Boolean): MyCircleProgressView {
         mShadowIsShow = enable
         invalidate()
         return this
+    }
+
+    /**
+     * 设置小数位数
+     * */
+    fun setDigit(digit: Int): MyCircleProgressView {
+        mDigit = digit
+        invalidate()
+        return this
+    }
+
+    /**
+     * 将double格式化为指定小数位的String，不足小数位用0补全
+     *
+     * @param v     需要格式化的数字
+     * @param scale 小数点后保留几位
+     * @return
+     */
+    fun roundByScale(v: Double, scale: Int): String {
+        if (scale < 0) {
+            throw  IllegalArgumentException(
+                "The   scale   must   be   a   positive   integer   or   zero"
+            )
+        }
+        if (scale == 0) {
+            return DecimalFormat("0").format(v)
+        }
+        var formatStr = "0."
+
+        for (i in 0 until scale) {
+            formatStr += "0"
+        }
+        return DecimalFormat(formatStr).format(v);
+    }
+
+    fun isNum(str: String): Boolean {
+        try {
+            val toDouble = str.toDouble()
+        } catch (e: Exception) {
+
+            return false
+        }
+
+        return true
     }
 
 }

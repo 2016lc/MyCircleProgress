@@ -28,5 +28,7 @@
         <attr name="shadowSize"/>
         <attr name="shadowColor"/>
         <attr name="shadowShow"/>
+        <attr name="digit"/>
+        <attr name="isanim"/>
     </declare-styleable>
 </resources>
