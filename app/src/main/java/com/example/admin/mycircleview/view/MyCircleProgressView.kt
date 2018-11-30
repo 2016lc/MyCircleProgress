@@ -1,4 +1,4 @@
-package com.example.admin.mycircleview
+package com.example.admin.mycircleview.view
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -6,6 +6,9 @@ import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import com.example.admin.mycircleview.Constant
+import com.example.admin.mycircleview.R
+import com.example.admin.mycircleview.Util
 import java.text.DecimalFormat
 
 /**
@@ -89,7 +92,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
         setLayerType(LAYER_TYPE_SOFTWARE, null)
         mPercent = 0f
         centerPosition = Point()//初始化圆心属性
-        mRectF = RectF()//初始化圆弧
+        mRectF = RectF()
         mAnimator = ValueAnimator()//初始化属性动画
         initAttrs(attrs, context)//初始化属性
         initPaint()//初始化画笔
@@ -100,21 +103,41 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
      * 初始化属性
      */
     private fun initAttrs(attrs: AttributeSet?, context: Context?) {
-        val typedArray = context!!.obtainStyledAttributes(attrs, R.styleable.MyCircleProgressView)
+        val typedArray = context!!.obtainStyledAttributes(attrs,
+            R.styleable.MyCircleProgressView
+        )
 
-        antiAlias = typedArray!!.getBoolean(R.styleable.MyCircleProgressView_antiAlias, Constant.ANTI_ALIAS)
+        antiAlias = typedArray!!.getBoolean(
+            R.styleable.MyCircleProgressView_antiAlias,
+            Constant.ANTI_ALIAS
+        )
         mSmallCirEnable =
-                typedArray.getBoolean(R.styleable.MyCircleProgressView_smallCirEnable, Constant.SMALLCIRCLE_ENABLE)
-        isAnim = typedArray.getBoolean(R.styleable.MyCircleProgressView_isanim, Constant.IS_ANIM)
+                typedArray.getBoolean(
+                    R.styleable.MyCircleProgressView_smallCirEnable,
+                    Constant.SMALLCIRCLE_ENABLE
+                )
+        isAnim = typedArray.getBoolean(
+            R.styleable.MyCircleProgressView_isanim,
+            Constant.IS_ANIM
+        )
 
-        mDigit = typedArray.getInt(R.styleable.MyCircleProgressView_digit, Constant.DEFALUT_DIGIT)
+        mDigit = typedArray.getInt(
+            R.styleable.MyCircleProgressView_digit,
+            Constant.DEFALUT_DIGIT
+        )
 
         mBgCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_mBgCirColor, Color.GRAY)
         mBgCirWidth =
-                typedArray.getDimension(R.styleable.MyCircleProgressView_mBgCirWidth, Constant.DEFAULT_BGCIR_WIDTH)
+                typedArray.getDimension(
+                    R.styleable.MyCircleProgressView_mBgCirWidth,
+                    Constant.DEFAULT_BGCIR_WIDTH
+                )
 
         mCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_mCirColor, Color.YELLOW)
-        mCirWidth = typedArray.getDimension(R.styleable.MyCircleProgressView_mCirWidth, Constant.DEFAULT_CIR_WIDTH)
+        mCirWidth = typedArray.getDimension(
+            R.styleable.MyCircleProgressView_mCirWidth,
+            Constant.DEFAULT_CIR_WIDTH
+        )
 
         mSmallCirColor = typedArray.getColor(R.styleable.MyCircleProgressView_smallCirColor, Color.WHITE)
         mSmallCirWidth =
@@ -123,30 +146,60 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
                     Constant.DEFAULT_SMALLCIRCLE_WIDTH
                 )
 
-        mAnimTime = typedArray.getInt(R.styleable.MyCircleProgressView_animTime, Constant.DEFAULT_ANIMTIME)
+        mAnimTime = typedArray.getInt(
+            R.styleable.MyCircleProgressView_animTime,
+            Constant.DEFAULT_ANIMTIME
+        )
 
         mValue = typedArray.getString(R.styleable.MyCircleProgressView_value)
-        mMaxValue = typedArray.getFloat(R.styleable.MyCircleProgressView_maxvalue, Constant.DEFAULT_MAX_VALUE)
+        mMaxValue = typedArray.getFloat(
+            R.styleable.MyCircleProgressView_maxvalue,
+            Constant.DEFAULT_MAX_VALUE
+        )
 
-        mStartAngle = typedArray.getFloat(R.styleable.MyCircleProgressView_startAngle, Constant.DEFAULT_START_ANGLE)
-        mSweepAngle = typedArray.getFloat(R.styleable.MyCircleProgressView_sweepAngle, Constant.DEFAULT_SWEEP_ANGLE)
+        mStartAngle = typedArray.getFloat(
+            R.styleable.MyCircleProgressView_startAngle,
+            Constant.DEFAULT_START_ANGLE
+        )
+        mSweepAngle = typedArray.getFloat(
+            R.styleable.MyCircleProgressView_sweepAngle,
+            Constant.DEFAULT_SWEEP_ANGLE
+        )
 
-        mValueSize = typedArray.getDimension(R.styleable.MyCircleProgressView_valueSize, Constant.DEFAULT_VALUE_SIZE)
+        mValueSize = typedArray.getDimension(
+            R.styleable.MyCircleProgressView_valueSize,
+            Constant.DEFAULT_VALUE_SIZE
+        )
         mValueColor = typedArray.getColor(R.styleable.MyCircleProgressView_valueColor, Color.BLACK)
 
         mHint = typedArray.getString(R.styleable.MyCircleProgressView_hint)
-        mHintSize = typedArray.getDimension(R.styleable.MyCircleProgressView_hintSize, Constant.DEFAULT_HINT_SIZE)
+        mHintSize = typedArray.getDimension(
+            R.styleable.MyCircleProgressView_hintSize,
+            Constant.DEFAULT_HINT_SIZE
+        )
         mHintColor = typedArray.getColor(R.styleable.MyCircleProgressView_hintColor, Color.GRAY)
 
         mUnit = typedArray.getString(R.styleable.MyCircleProgressView_unit)
-        mUnitSize = typedArray.getDimension(R.styleable.MyCircleProgressView_unitSize, Constant.DEFAULT_UNIT_SIZE)
+        mUnitSize = typedArray.getDimension(
+            R.styleable.MyCircleProgressView_unitSize,
+            Constant.DEFAULT_UNIT_SIZE
+        )
         mUnitColor = typedArray.getColor(R.styleable.MyCircleProgressView_unitColor, Color.GRAY)
 
         mShadowColor = typedArray.getColor(R.styleable.MyCircleProgressView_shadowColor, Color.BLACK)
-        mShadowIsShow = typedArray.getBoolean(R.styleable.MyCircleProgressView_shadowShow, Constant.SHADOW_SHOW)
-        mShadowSize = typedArray.getFloat(R.styleable.MyCircleProgressView_shadowSize, Constant.DEFAULT_SHADOW_SIZE)
+        mShadowIsShow = typedArray.getBoolean(
+            R.styleable.MyCircleProgressView_shadowShow,
+            Constant.SHADOW_SHOW
+        )
+        mShadowSize = typedArray.getFloat(
+            R.styleable.MyCircleProgressView_shadowSize,
+            Constant.DEFAULT_SHADOW_SIZE
+        )
 
-        isGradient = typedArray.getBoolean(R.styleable.MyCircleProgressView_isGradient, Constant.IS_GRADIENT)
+        isGradient = typedArray.getBoolean(
+            R.styleable.MyCircleProgressView_isGradient,
+            Constant.IS_GRADIENT
+        )
         mGradientColor = typedArray.getResourceId(R.styleable.MyCircleProgressView_gradient, 0)
         if (mGradientColor != 0) {
             mGradientColors = resources.getIntArray(mGradientColor!!)
@@ -352,9 +405,9 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
         mAnimator!!.addUpdateListener {
             mPercent = it.animatedValue as Float?
             mValue = if (isAnim!!) {
-                roundByScale((mPercent!! * mMaxValue!!).toDouble(), mDigit!!)
+                Util.roundByScale((mPercent!! * mMaxValue!!).toDouble(), mDigit!!)
             } else {
-                roundByScale(mValue!!.toDouble(), mDigit!!)
+                Util.roundByScale(mValue!!.toDouble(), mDigit!!)
             }
             postInvalidate()
         }
@@ -362,7 +415,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     }
 
     /**
-     * 设置动画时常
+     * 设置动画时长
      * */
     fun setAnimTime(animTime: Int): MyCircleProgressView {
         this.mAnimTime = animTime
@@ -416,29 +469,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
         return this
     }
 
-    /**
-     * 将double格式化为指定小数位的String，不足小数位用0补全
-     *
-     * @param v     需要格式化的数字
-     * @param scale 小数点后保留几位
-     * @return
-     */
-    fun roundByScale(v: Double, scale: Int): String {
-        if (scale < 0) {
-            throw  IllegalArgumentException(
-                "The   scale   must   be   a   positive   integer   or   zero"
-            )
-        }
-        if (scale == 0) {
-            return DecimalFormat("0").format(v)
-        }
-        var formatStr = "0."
 
-        for (i in 0 until scale) {
-            formatStr += "0"
-        }
-        return DecimalFormat(formatStr).format(v);
-    }
 
     fun isNum(str: String): Boolean {
         try {

@@ -1,32 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:gravity="center"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+
 >
 
-    <com.example.admin.mycircleview.MyCircleProgressView
-            android:id="@+id/cirView"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            app:antiAlias="true"
-            app:mBgCirColor="#f0f0f0"
-            app:mCirColor="#fff888"
-            app:mCirWidth="20sp"
-            app:mBgCirWidth="10sp"
-            app:valueSize="30sp"
-            app:valueColor="#000"
-            app:unit="%"
-            app:unitSize="15sp"
-            app:unitColor="#00CED1"
-            app:hint="我是提示语"
-            app:hintSize="14sp"
-            app:hintColor="#FF1493"
-            app:startAngle="135"
-            app:sweepAngle="270"
-            android:padding="5dp"
-            app:isanim="false"
-            />
+    <Button
+            android:id="@+id/btn_circleprogress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+    android:text="CIRCLEPROGRESS"/>
+
+    <Button android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:id="@+id/btn_piechart"
+    android:text="PIECHART"/>
 
 
 </LinearLayout>

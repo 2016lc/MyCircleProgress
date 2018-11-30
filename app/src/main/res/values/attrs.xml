@@ -31,4 +31,17 @@
         <attr name="digit"/>
         <attr name="isanim"/>
     </declare-styleable>
+
+    <!--扇形图-->
+    <declare-styleable name="MyPieChartView">
+        <attr name="piechartWidth"/>
+        <attr name="dataSize"/>
+        <attr name="dataColor"/>
+        <attr name="unit"/>
+        <attr name="unitSize"/>
+        <attr name="unitColor"/>
+        <attr name="layoutType"/>
+        <attr name="verticalMargin"/>
+        <attr name="horiMargin"/>
+    </declare-styleable>
 </resources>
