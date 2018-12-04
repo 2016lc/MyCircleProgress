@@ -10,9 +10,11 @@
             android:layout_width="300dp"
             android:layout_height="300dp"
             app:horiMargin="20dp"
-            app:verticalMargin="20dp"
-            android:background="#000"
-            app:layoutType="horizontal"
+            app:dataColor="#333333"
+            app:numColor="#333333"
+            app:verticalMargin="40dp"
+            app:layoutType="default"
+
     />
 
 

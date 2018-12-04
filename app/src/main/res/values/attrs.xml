@@ -37,11 +37,13 @@
         <attr name="piechartWidth"/>
         <attr name="dataSize"/>
         <attr name="dataColor"/>
-        <attr name="unit"/>
-        <attr name="unitSize"/>
-        <attr name="unitColor"/>
+        <attr name="numSize"/>
+        <attr name="numColor"/>
         <attr name="layoutType"/>
         <attr name="verticalMargin"/>
         <attr name="horiMargin"/>
+        <attr name="animTime"/>
+        <attr name="pointingColor"/>
+        <attr name="pointingWidth"/>
     </declare-styleable>
 </resources>

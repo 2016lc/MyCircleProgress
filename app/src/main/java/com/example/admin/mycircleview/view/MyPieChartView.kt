@@ -8,10 +8,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextPaint
 import android.util.AttributeSet
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import com.example.admin.mycircleview.*
@@ -25,7 +23,6 @@ import java.util.ArrayList
  */
 class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(context, attrs) {
 
-
     private var mPieChartPaint: Paint? = null//画笔
     private var mPieChartWidth: Float? = null
     //圆心位置
@@ -38,7 +35,7 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
     //数据
     private var mData: MutableList<PieChartData>? = ArrayList()
     //总数
-    private var mTotalNum: Int? = 0
+    private var mTotalNum: Float? = 0f
     //开始角度
     private var mStartAngle: Float? = 0f
     //扫过的角度
@@ -66,11 +63,15 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
     //声明adapter
     private var adapter: mAdapter? = null
     //布局样式
-    private var mLayoutType: String = "default" //default 普通样式  vertical 竖向布局  horizontal 横向布局
+    private var mLayoutType: String? = null //default 普通样式  vertical 竖向布局  horizontal 横向布局  pointingInstructions 指向说明
     //横向间距
     private var mHoriMargin: Float? = null
     //纵向间距
     private var mVerticalMargin: Float? = null
+    //指向说明
+    private var mPointingPaint: Paint? = null
+    private var mPointingWidth: Float? = null
+    private var mPointingColor: Int? = null
 
     init {
         mContext = context
@@ -97,8 +98,8 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
         mDataSize = typedArray.getDimension(R.styleable.MyPieChartView_dataSize, PieChartConstant.DEFAULT_DATA_SIZE)
         mDataColor = typedArray.getColor(R.styleable.MyPieChartView_dataColor, Color.WHITE)
 
-        mUnitColor = typedArray.getColor(R.styleable.MyPieChartView_unitColor, Color.WHITE)
-        mUnitSize = typedArray.getFloat(R.styleable.MyPieChartView_unitSize, PieChartConstant.DEFAULT_UNIT_SIZE)
+        mUnitColor = typedArray.getColor(R.styleable.MyPieChartView_numColor, Color.WHITE)
+        mUnitSize = typedArray.getFloat(R.styleable.MyPieChartView_numSize, PieChartConstant.DEFAULT_UNIT_SIZE)
 
         mHoriMargin =
                 typedArray.getDimension(R.styleable.MyPieChartView_horiMargin, PieChartConstant.DEFAULT_HORI_MARGIN)
@@ -106,9 +107,22 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
             R.styleable.MyPieChartView_verticalMargin,
             PieChartConstant.DEFAULT_VERTICAL_MARGIN
         )
-        // mUnit = typedArray.getString(R.styleable.MyPieChartView_unit)
+
+        mAnimTime = typedArray.getInt(R.styleable.MyPieChartView_animTime, PieChartConstant.DEFAULT_ANIM_TIME)
+
+
+        mPointingColor = typedArray.getColor(R.styleable.MyPieChartView_pointingColor, Color.GRAY)
+        mPointingWidth = typedArray.getDimension(
+            R.styleable.MyPieChartView_pointingWidth,
+            PieChartConstant.DEFAULT_POINTING_WIDTH
+        )
+
+
 
         mLayoutType = typedArray.getString(R.styleable.MyPieChartView_layoutType)
+        if (mLayoutType == null) {
+            mLayoutType = "default"
+        }
 
         typedArray.recycle()
     }
@@ -120,9 +134,9 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
         mPieChartPaint!!.style =
                 Paint.Style.FILL//画笔样式  //STROKE 只绘制图形轮廓（描边） FILL 只绘制图形内容 FILL_AND_STROKE 既绘制轮廓也绘制内容
         mPieChartPaint!!.strokeWidth = mPieChartWidth!!//画笔宽度
-        mPieChartPaint!!.strokeCap =
-                Paint.Cap.ROUND//笔刷样式 //当画笔样式为STROKE或FILL_OR_STROKE时，设置笔刷的图形样式，如圆形样式Cap.ROUND,或方形样式Cap.SQUARE
-        mPieChartPaint!!.color = Color.RED
+        /*mPieChartPaint!!.strokeCap =
+                Paint.Cap.SQUARE*///笔刷样式 //当画笔样式为STROKE或FILL_OR_STROKE时，设置笔刷的图形样式，如圆形样式Cap.ROUND,或方形样式Cap.SQUARE
+        //mPieChartPaint!!.color = Color.RED
 
         mDataPaint = TextPaint()
         mDataPaint!!.isDither = true
@@ -138,6 +152,12 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
         mUnitPaint!!.textSize = mUnitSize!!//字体大小
         mUnitPaint!!.color = mUnitColor!!//字体颜色
         mUnitPaint!!.textAlign = Paint.Align.CENTER//从中间向两边绘制，不需要再次计算文字
+
+        mPointingPaint = Paint()
+        mPointingPaint!!.isAntiAlias = true//是否开启抗锯齿
+        mPointingPaint!!.isDither = true//防抖动
+        mPointingPaint!!.color = mPointingColor!!
+        mPointingPaint!!.strokeWidth = mPointingWidth!!
 
 
     }
@@ -168,7 +188,7 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
                             h - paddingBottom - paddingTop - mVerticalMargin!!.toInt() * 2
                         )
             }
-            "default" -> {
+            else -> {
                 //圆心位置
                 centerPosition!!.x = w / 2
                 centerPosition!!.y = h / 2
@@ -178,7 +198,11 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
             }
         }
 
-        raduis = (minWidth!! / 2).toFloat()
+        raduis = if (mLayoutType == "pointingInstructions") {
+            (minWidth!! / 2).toFloat() - 75
+        } else {
+            (minWidth!! / 2).toFloat()
+        }
         dataRaduis = raduis!! * 3 / 4
         //矩形坐标
         mRectF!!.left = centerPosition!!.x - raduis!!
@@ -196,13 +220,7 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        /*    val view = getChildAt(0)
-            val para = view.layoutParams as FrameLayout.LayoutParams
-            para.setMargins(
-                0, 0, width - measuredWidth / 3 - 107 -
-                        view.measuredWidth, 0
-            )
-            view.layoutParams = para*/
+
     }
 
 
@@ -215,18 +233,51 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
     private fun drawPieChart(canvas: Canvas?) {
         canvas!!.save()
         mStartAngle = 0f
+        mSweepAngle = 0f
         for (i in 0 until mData!!.size) {
             mPieChartPaint!!.color = mData!![i].color!!
 
-            mSweepAngle = (mData!![i].num!!.toFloat() / mTotalNum!!.toFloat()) * 360f
+            mSweepAngle = (mData!![i].num!! / mTotalNum!!) * 360 * mPercent!!
 
+            Log.i("123213213",(mData!![i].num!! / mTotalNum!!).toString())
             //画圆
-            canvas.drawArc(mRectF!!, mStartAngle!!, mSweepAngle!! * mPercent!!, true, mPieChartPaint!!)
-            mStartAngle = mStartAngle!! + mSweepAngle!! * mPercent!!
-            //画数据
-            drawData(canvas, i)
+            canvas.drawArc(mRectF!!, mStartAngle!!, mSweepAngle!!, true, mPieChartPaint!!)
+            mStartAngle = mStartAngle!! + mSweepAngle!!
+            if (mLayoutType == "pointingInstructions") {
+                //指向说明
+                pointData(canvas, i)
+            } else {
+                //画数据
+                drawData(canvas, i)
+            }
         }
         canvas.restore()
+    }
+
+    private fun pointData(canvas: Canvas, i: Int) {
+        val xP = centerPosition!!.x + raduis!! *
+                Math.sin(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
+        val yP = centerPosition!!.y - raduis!! *
+                Math.cos(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
+        val xEdP = centerPosition!!.x + (raduis!! + 20) *
+                Math.sin(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
+        val yEdP = centerPosition!!.y - (raduis!! + 20) *
+                Math.cos(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
+        var xLast = 0f
+        xLast = if (mStartAngle!! - mSweepAngle!! / 2 >= 270 || mStartAngle!! - mSweepAngle!! / 2 <= 90) {
+            xEdP + 30
+        } else {
+            xEdP - 30
+        }
+        canvas.drawLine(xP, yP, xEdP, yEdP, mPointingPaint!!)
+        canvas.drawLine(xEdP, yEdP, xLast, yEdP, mPointingPaint!!)
+        canvas.drawText(mData!![i].name!!, xLast, yEdP, mDataPaint!!)
+        canvas.drawText(
+            mData!![i].num!!.toString() + mData!![i].unit,
+            xLast,
+            yEdP - mDataPaint!!.ascent() + 5,
+            mUnitPaint!!
+        )
     }
 
     private fun drawData(canvas: Canvas, i: Int) {
@@ -234,6 +285,7 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
                 Math.sin(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
         val y = centerPosition!!.y - dataRaduis!! *
                 Math.cos(Math.toRadians((90 + mStartAngle!! - mSweepAngle!! / 2).toDouble())).toFloat()
+
         when (mType) {
             PieChartType.CONTENT_NUM -> {
                 canvas.drawText(mData!![i].name!!, x, y, mDataPaint!!)
@@ -272,6 +324,7 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
             }
         }
     }
+
 
     /**
      * 增加列表说明
@@ -359,8 +412,8 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
             }
         }
         mData!!.addAll(data)
-        startAnim(3000)
-        if (mLayoutType != "default") {
+        startAnim(mAnimTime!!)
+        if (mLayoutType != "default" && mLayoutType != "pointingInstructions") {
             if (adapter == null) {
                 adapter = mAdapter(mContext!!, mData)
                 mRecyclerView!!.adapter = adapter
