@@ -215,7 +215,6 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -229,7 +228,6 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
         drawPieChart(canvas)
     }
 
-
     private fun drawPieChart(canvas: Canvas?) {
         canvas!!.save()
         mStartAngle = 0f
@@ -239,7 +237,6 @@ class MyPieChartView(context: Context?, attrs: AttributeSet?) : FrameLayout(cont
 
             mSweepAngle = (mData!![i].num!! / mTotalNum!!) * 360 * mPercent!!
 
-            Log.i("123213213",(mData!![i].num!! / mTotalNum!!).toString())
             //画圆
             canvas.drawArc(mRectF!!, mStartAngle!!, mSweepAngle!!, true, mPieChartPaint!!)
             mStartAngle = mStartAngle!! + mSweepAngle!!

@@ -46,4 +46,11 @@
         <attr name="pointingColor"/>
         <attr name="pointingWidth"/>
     </declare-styleable>
+
+    <!--柱状图-->
+    <declare-styleable name="MyBarChartView">
+        <attr name="barWidth"/>
+    </declare-styleable>
+
+
 </resources>

@@ -12,4 +12,11 @@
     </integer-array>
     <color name="color_home_top">#ffa20f</color>
     <color name="progress_end_color">#ff7c0d</color>
+
+    <color name="xy_color">#999999</color>
+    <color name="text_color">#333333</color>
+    <color name="bar_color">#000</color>
+    <color name="line_color">#eeeeee</color>
+
+
 </resources>

@@ -24,5 +24,12 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+
+        btn_barchart.setOnClickListener {
+            run {
+                var intent = Intent(this, MyBarChartActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 }

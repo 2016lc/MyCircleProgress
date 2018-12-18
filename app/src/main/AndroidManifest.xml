@@ -18,6 +18,7 @@
         </activity>
         <activity android:name=".MyCircleProgress"/>
         <activity android:name=".MyPieChart"/>
+        <activity android:name=".MyBarChartActivity"/>
     </application>
 
 </manifest>
