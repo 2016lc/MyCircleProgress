@@ -83,7 +83,7 @@ class MyCircleProgressView(context: Context?, attrs: AttributeSet?) :
     private var mShadowColor: Int? = null
     private var mShadowSize: Float? = null
     private var mShadowIsShow: Boolean? = null
-    //是否是整数
+    //保留的小数位数
     private var mDigit: Int? = null
     //是否需要动画
     private var isAnim: Boolean? = null

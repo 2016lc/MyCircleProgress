@@ -50,6 +50,15 @@
     <!--柱状图-->
     <declare-styleable name="MyBarChartView">
         <attr name="barWidth"/>
+        <attr name="bg"/>
+        <attr name="yUnit"/>
+        <attr name="mSegment"/>
+        <attr name="mDigit"/>
+        <attr name="barColor"/>
+        <attr name="isAnim"/>
+        <attr name="animTime"/>
+        <attr name="isShowTopNum"/>
+        <attr name="isShowGridLine"/>
     </declare-styleable>
 
 

@@ -10,10 +10,8 @@ class BarChartData {
 
     var name: String? = null
     var value: Float? = null
-    var unit:String?=null
-    constructor(name: String?, value: Float?,unit:String?) {
+    constructor(name: String?, value: Float?) {
         this.name = name
         this.value = value
-        this.unit=unit
     }
 }
